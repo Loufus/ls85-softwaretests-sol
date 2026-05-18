@@ -31,6 +31,23 @@ def berechne_gesamtpreis(artikel: List[Dict], rabatt_prozent: float = 0) -> floa
     rabatt = summe * (rabatt_prozent / 100)
     return round(summe - rabatt, 2)
 
+warenkorb = [
+    {"name": "Apfel", "preis": 0.50, "menge": 4},
+    {"name": "Brot",  "preis": 2.00, "menge": 1},
+]
+ergebnis = berechne_gesamtpreis(warenkorb)
+print("Test 1 – Ohne Rabatt:")
+print(f"  Erwartet: 4.0  | Erhalten: {ergebnis} | {'OK' if ergebnis == 4.0 else 'FEHLER'}")
+
+# Fall 2: Einkauf mit 10 % Rabatt
+ergebnis = berechne_gesamtpreis(warenkorb, rabatt_prozent=10)
+print("Test 2 – Mit 10 % Rabatt:")
+print(f"  Erwartet: 3.6  | Erhalten: {ergebnis} | {'OK' if ergebnis == 3.6 else 'FEHLER'}")
+
+# Fall 3: Leerer Warenkorb (Sonderfall)
+ergebnis = berechne_gesamtpreis([])
+print("Test 3 – Leerer Warenkorb:")
+print(f"  Erwartet: 0.0  | Erhalten: {ergebnis} | {'OK' if ergebnis == 0.0 else 'FEHLER'}")
 
 def finde_guenstigsten_artikel(artikel: List[Dict]) -> Dict:
     """
