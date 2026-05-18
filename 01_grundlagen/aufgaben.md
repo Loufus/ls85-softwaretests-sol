@@ -92,12 +92,12 @@ Testverfahren werden in zwei Kategorien eingeteilt:
 
 | Maßnahme | Statisch | Dynamisch |
 |----------|----------|-----------|
-| Code Review durch einen Kollegen | | |
-| Programm mit Testdaten ausführen | | |
-| Syntaxprüfung durch den Editor | | |
-| Walkthroughs im Team | | |
-| Unit-Tests laufen lassen | | |
-| Checklisten für Codestruktur | | |
+| Code Review durch einen Kollegen |S | |
+| Programm mit Testdaten ausführen |D | |
+| Syntaxprüfung durch den Editor |M S| |
+| Walkthroughs im Team | S| |
+| Unit-Tests laufen lassen | D| |
+| Checklisten für Codestruktur M|S | |
 
 Trage die Tabelle (als Markdown) in einen Kommentarblock in `starter.py` ein oder erstelle eine Datei `01_antworten.md`.
 
@@ -133,10 +133,15 @@ Eine Softwarefirma entwickelt eine Webanwendung für Lagerverwaltung.
 Der Teamleiter sagt: "Wir haben keine Zeit für Tests – wir liefern direkt ans Produktivsystem."
 
 **(a)** Nennen Sie zwei konkrete Risiken, die durch das Weglassen von Tests entstehen. *(2 Punkte)*
+Ungetestet Software kann sicherheitslücken haben. UND DAS SCHWIRIGSTE ist es wenn man etwas erstzt kann es zu Fehlern kommen das sollte man nacheinander machen. Nicht auf ein schlag.
 
 **(b)** Unterscheiden Sie die Begriffe „Defekt" und „Versagen" anhand eines Beispiels aus dem Lagerverwaltungssystem. *(4 Punkte)*
+Defekt ist ein Problem in Code der Falsch umgesetzt wurde anstadt Prozent abzuzeihen wurde es drauf addiert. Und versagen ist wenn
+das Programm mit der eingabe nicht den Kompletten Prozess abschließen weil es auf ein Defekt läuft z.b zu große Nummern ...
 
 **(c)** Erläutern Sie, warum frühzeitiges Testen (Grundprinzip 3) wirtschaftlich sinnvoll ist. Nutzen Sie das Schlagwort „Rule of Ten". *(4 Punkte)*
+
+Rule of Ten jeder Fehler der in Abreitsabauf später gefunden wird ist 10 Mal so teuer als ihn direkt zu finden und zu Fixxen.
 
 Schreibe deine Antworten in `01_antworten.md`.
 
