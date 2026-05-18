@@ -23,13 +23,13 @@ def berechne_rabatt(preis: float, prozent: float) -> float:
 # Aufgabe 1a): Beantworte folgende Fragen als Kommentar:
 
 # Error (falsche Handlung des Entwicklers):
-# TODO: Deine Antwort hier
+# TODO: Der Entwickler hat Falsch gerechnet anstadt 80 würde bei den Error 20000 raus kommen.
 
 # Defect (fehlerhafte Stelle im Code):
-# TODO: Deine Antwort hier
+# TODO: mit (prozent / 100) kann man das richtig kriegen egal mit welchen rabatt.
 
 # Failure (was der Benutzer bemerken würde):
-# TODO: Deine Antwort hier
+# TODO: Der User würde mitbekommen das er viel mehr bezahlen müsste.
 
 
 # Aufgabe 1b): Korrigiere die Funktion unten und füge print()-Tests hinzu.
@@ -39,7 +39,8 @@ def berechne_rabatt_korrigiert(preis: float, prozent: float) -> float:
     Korrigierte Version von berechne_rabatt().
     TODO: Implementiere die korrekte Logik.
     """
-    pass  # TODO: Ersetze 'pass' durch deine Implementierung
+    rabatt = preis * (prozent / 100)
+    return preis - rabatt
 
 
 # Manuelle Tests (werden in Baustein 05 durch echte Unit-Tests ersetzt)
@@ -51,7 +52,9 @@ if __name__ == "__main__":
     print(berechne_rabatt(100.0, 20))  # Falsche Ausgabe erwartet
 
     print("\n=== Test: berechne_rabatt_korrigiert ===")
-    # TODO: Deine Tests hier
+    print(berechne_rabatt_korrigiert(100.0, 20))
+    print(berechne_rabatt_korrigiert(100.0, 30))
+    print(berechne_rabatt_korrigiert(500.0, 10))
 
 
 # ============================================================
@@ -70,7 +73,8 @@ if __name__ == "__main__":
 # | Checklisten für Codestruktur        | TODO     | TODO      |
 #
 # Warum reicht statisches Testen allein nicht aus?
-# TODO: Deine Erklärung hier (2 Sätze)
+# TODO: Wenn man nur sich den Code anschaut kann man Sachen vergessen, übersehen. Man muss den code auf richtig laufen lassen damit man sehen kann was man nicht bedacht hat.
+
 
 
 # ============================================================
@@ -78,12 +82,12 @@ if __name__ == "__main__":
 # ============================================================
 
 # Prinzip 2 – Vollständiges Testen ist unmöglich:
-# Beispiel aus dem Berufsalltag:
-# TODO: Deine Antwort hier
+# Beispiel aus dem Berufsalltag: Windows..
+# TODO: Ein Programm vollständig zu testen ist beihnahe unmöglich wegen der Dauer um "Alles" zu testen.
 
 # Prinzip 4 – Defect Clustering:
-# Beispiel aus dem Berufsalltag:
-# TODO: Deine Antwort hier
+# Beispiel aus dem Berufsalltag: Wenn ein Prozess auf Fehler laüft laufen mehrer auf Fehler bis man den Fehler behebt.
+# TODO: ja häufigen sich halt.
 
 # Welches Prinzip überrascht dich? Warum?
-# TODO: Deine Antwort hier
+# TODO: garkeins sind doch alle logisch.

@@ -159,11 +159,20 @@ Erkläre mir, warum wir damit anfangen sollen, und was genau wir testen müssen.
 Nutze mindestens drei der sieben Grundprinzipien und ein reales Beispiel
 (Ariane-5, Therac-25, Y2K oder ein eigenes Beispiel aus dem Berufsalltag).
 
+Wir sollten Test einführen da auch wenn ein system keine Fehler anzeigt es trotzdem Fehler hat die uns offen stehen lassen für
+sicherheitslücken. Wenn wir noch nie Test gemacht haben dann häufigen sich die selben fehler weil wir nie festgehstellt haben das es Falsch sit.
+Wenn wir jetzt anfangen zu testen sparren wir sehr viel Geld als wenn wir erst drauf reagieren wenn es Probleme gibt.
+Ariane-5 ist ein gutes beispiel
+
 **b)** Dein Betrieb entwickelt eine neue Funktion `berechne_urlaubstage(eintrittsdatum, arbeitstage_pro_woche)`.
 - Identifiziere einen möglichen Fehler (Error), Defekt (Defect) und ein Versagen (Failure) für diese Funktion.
 - Beschreibe die Konsequenzen eines unentdeckten Defekts in einem Lohnabrechnungssystem.
 
+Fehler Falsche Urlaubstage für eine Person. Defekt richtige abrechnung der Urlaubstage. Failure wenn jemand gekündigkt wird.
+Riesiger Geldverlust was immer zu riesiegen Problemen führt.
+
 **c)** Bewerte: Ist Grundprinzip 7 ("Keine Fehler = Gutes System") für diesen Fall relevant? Begründe.
+Es ist immer Relevant wenn man nur Testet udn spizeielle Fälle abdeckt können andere dur rutschen.
 
 Schreibe deine Antworten in `01_antworten.md`.
 
@@ -182,6 +191,7 @@ Schreibe deine Antworten in `01_antworten.md`.
 
 Haltet das Ergebnis in `01_antworten.md` fest (3–5 Sätze).
 
+Bug ist ein Fehler in Code. und Fehler ist wenn der Entwickler Falsch gedacht hat.
 ---
 
 ## Active Recall – Brain Dump 🧠
@@ -189,8 +199,11 @@ Haltet das Ergebnis in `01_antworten.md` fest (3–5 Sätze).
 *Schließe alle Unterlagen. Schreibe 5 Minuten lang alles auf, was du zu folgenden Fragen weißt:*
 
 1. Was ist der Unterschied zwischen Error, Defect und Failure?
+Error = ENtwickler hat Falschen Code geschrieben. Defect Code macht Sachen die der Entwickler nicht will. Failure ist es dann wenn der Kunde den Fehler sieht.
 2. Warum können wir nie sicher sein, dass Software fehlerfrei ist?
+weil das nicht möglich ist ab einer bestimmten größe und einen sich immer änderen Internet
 3. Nenne 3 reale Beispiele, wo fehlende Softwaretests zu Problemen geführt haben.
+die die sie gennant hatten.
 
 *(Öffne erst danach die Unterlagen und vergleiche)*
 
@@ -201,13 +214,13 @@ Haltet das Ergebnis in `01_antworten.md` fest (3–5 Sätze).
 *Nach dem Bearbeiten: Wie schätzt du dich jetzt ein?*
 
 - [ ] 🟢 Ich verstehe alle Konzepte und kann sie erklären
-- [ ] 🟡 Ich verstehe die meisten Konzepte, habe aber noch Fragen
+- [X] 🟡 Ich verstehe die meisten Konzepte, habe aber noch Fragen
 - [ ] 🔴 Ich brauche noch mehr Zeit oder Unterstützung
 
 **Was nehme ich aus diesem Baustein mit?**
 
-> _______________________________________________
+> _________________________KI______________________
 
 ---
 
-*Bei Problemen → [Stuck Protocol](../stuck_protocol.md) · Lösungen im Branch `loesungen` (erst nach eigenem Versuch!)*
+*Bei Problemen → [Stuck Protocol](../stuck_protocol.md) · Lösungen im Branch `loesungen` (erst nach eigenem Versuch!)*'
