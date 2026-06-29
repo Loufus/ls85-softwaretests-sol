@@ -273,3 +273,169 @@ Dann Code-Review im Tandem:
 ---
 
 *Bei Problemen → [Stuck Protocol](../stuck_protocol.md)*
+
+Aufgabe 0
+a) 5 Tests wurden ausgeführt, 3 waren erfolgreich.
+b) FAILED = der Test lief durch, aber eine Assertion war falsch (erwartetes ≠ tatsächliches Ergebnis). ERROR = der Test ist gar nicht erst vollständig gelaufen, weil eine unerwartete Exception aufgetreten ist (z. B. NameError, TypeError).
+c) test_dividieren schlägt fehl. Möglicher Grund: Die Funktion liefert ein falsches Ergebnis, z. B. durch einen Rundungsfehler bei Floats oder einen Logikfehler.
+d) Die Tests befinden sich in test_rechner.py – erkennbar am Präfix test_rechner.py:: vor jedem Testnamen.
+e) pytest test_rechner.py -v – das -v steht für "verbose" und zeigt jeden einzelnen Testnamen mit Ergebnis an.
+
+Aufgabe 1
+a)
+python# unittest-Stil:
+class TestKontorechner(unittest.TestCase):
+    def test_einzahlen_positiver_betrag(self):
+        konto = Kontorechner()
+        konto.einzahlen(100)
+        self.assertEqual(konto.kontostand, 100)
+
+    def test_abheben_kein_guthaben(self):
+        konto = Kontorechner()
+        with self.assertRaises(ValueError):
+            konto.abheben(50)
+
+# pytest-Stil:
+def test_einzahlen_positiver_betrag():
+    konto = Kontorechner()
+    konto.einzahlen(100)
+    assert konto.kontostand == 100
+
+def test_abheben_kein_guthaben():
+    konto = Kontorechner()
+    with pytest.raises(ValueError):
+        konto.abheben(50)
+Vereinfacht: kein Erben von unittest.TestCase, kein self, keine self.assert...-Methoden – nur normales assert. Fehlt: automatisches setUp/tearDown (wird durch Fixtures ersetzt).
+b) PASSED = Assertion erfüllt. FAILED = Assertion fehlgeschlagen. ERROR = unerwartete Exception während des Tests.
+
+Aufgabe 2
+a + b)
+pythonimport pytest
+
+@pytest.fixture
+def kontoservice():
+    service = BenutzerkontoService()
+    service.benutzer_anlegen("testuser", "Test1234!")
+    return service
+
+def test_benutzer_existiert(kontoservice):
+    assert kontoservice.benutzer_existiert("testuser") == True
+
+def test_login_korrekt(kontoservice):
+    assert kontoservice.login("testuser", "Test1234!") == True
+
+def test_login_falsches_passwort(kontoservice):
+    assert kontoservice.login("testuser", "falsch") == False
+
+def test_benutzer_loeschen(kontoservice):
+    kontoservice.benutzer_loeschen("testuser")
+    assert kontoservice.benutzer_existiert("testuser") == False
+Das Fixture wird für jeden Test neu erzeugt, damit Tests sich nicht gegenseitig beeinflussen. Wenn test_benutzer_loeschen den Benutzer löscht, hat das keinen Einfluss auf den nächsten Test.
+c)
+python@pytest.fixture(scope="module")
+def kontoservice():
+    service = BenutzerkontoService()
+    service.benutzer_anlegen("testuser", "Test1234!")
+    return service
+scope="module" ist sinnvoll, wenn das Anlegen des Objekts teuer ist (z. B. Datenbankverbindung) und alle Tests im Modul dasselbe Objekt nutzen können, ohne es zu verändern. Achtung: Tests dürfen dann den Zustand nicht gegenseitig beeinflussen.
+
+Aufgabe 3
+a)
+pythonimport pytest
+
+@pytest.mark.parametrize("punkte, erwartete_note", [
+    (100, 1),
+    (95, 1),
+    (92, 1),
+    (91, 2),
+    (85, 2),
+    (81, 2),
+    (80, 3),
+    (74, 3),
+    (67, 3),
+    (66, 4),
+    (58, 4),
+    (50, 4),
+    (49, 5),
+    (40, 5),
+    (30, 5),
+    (29, 6),
+    (15, 6),
+    (0, 6),
+])
+def test_berechne_note(punkte, erwartete_note):
+    assert berechne_note(punkte) == erwartete_note
+b)
+python@pytest.mark.parametrize("menge, erwartet", [
+    (1, True),
+    (2, True),
+    (500, True),
+    (998, True),
+    (999, True),
+    (0, False),
+    (-5, False),
+    (1000, False),
+])
+def test_validiere_menge(menge, erwartet):
+    assert validiere_menge(menge) == erwartet
+c) pytest erzeugt aus den parametrisierten Listen automatisch einzelne Testfälle – 18 für berechne_note, 8 für validiere_menge. Laufzeit liegt im Millisekunden-Bereich, da kein I/O beteiligt ist.
+
+Aufgabe 4
+a)
+pythondef test_negative_einzahlung():
+    konto = Kontorechner()
+    with pytest.raises(ValueError, match="positiv"):
+        konto.einzahlen(-50)
+
+def test_einzahlung_null():
+    konto = Kontorechner()
+    with pytest.raises(ValueError, match="positiv"):
+        konto.einzahlen(0)
+
+def test_abheben_ohne_guthaben():
+    konto = Kontorechner()
+    with pytest.raises(ValueError, match="Guthaben"):
+        konto.abheben(100)
+b) Beide nutzen denselben Context-Manager-Stil und sind funktional gleichwertig. pytest.raises zeigt bei Fehlern mehr Kontext und unterstützt match= direkt als Parameter. unittest.assertRaises erfordert eine Testklasse. Im Berufsalltag ist pytest.raises üblicher, weil es weniger Boilerplate hat und besser lesbar ist.
+
+Aufgabe 5
+a)
+pythondef berechne_versandkosten(gewicht: float, express: bool) -> float:
+    if not isinstance(gewicht, (int, float)):
+        raise TypeError("Gewicht muss eine Zahl sein")
+    if gewicht <= 0:
+        raise ValueError("Gewicht muss positiv sein")
+    if express:
+        return 8.90 if gewicht <= 5 else 14.90
+    else:
+        return 3.90 if gewicht <= 5 else 6.90
+b)
+python@pytest.mark.parametrize("gewicht, express, erwartet", [
+    (3.0, True,  8.90),
+    (5.0, True,  8.90),
+    (5.1, True,  14.90),
+    (10.0, True, 14.90),
+    (3.0, False, 3.90),
+    (5.0, False, 3.90),
+    (5.1, False, 6.90),
+    (10.0, False, 6.90),
+])
+def test_versandkosten_gueltig(gewicht, express, erwartet):
+    assert berechne_versandkosten(gewicht, express) == pytest.approx(erwartet)
+c)
+pythondef test_negatives_gewicht_wirft_fehler():
+    with pytest.raises(ValueError, match="positiv"):
+        berechne_versandkosten(-1, False)
+
+def test_falscher_typ_wirft_fehler():
+    with pytest.raises(TypeError, match="Zahl"):
+        berechne_versandkosten("schwer", False)
+d) Parametrisierung vermeidet Codeduplikation: statt 8 einzelner Funktionen mit identischer Struktur gibt es eine einzige Funktion mit einer Datentabelle. Neue Testfälle lassen sich durch eine Zeile in der Liste ergänzen, ohne neuen Code zu schreiben. Außerdem zeigt pytest bei Fehlern genau welcher Parametersatz gescheitert ist.
+
+Active Recall
+
+Eine pytest-Testfunktion ist eine normale Funktion (kein self, kein Erben von TestCase), die mit test_ beginnt und normales assert verwendet.
+Ein Fixture bereitet Testobjekte oder Ressourcen vor, die mehrere Tests brauchen – ähnlich wie setUp(), aber flexibler und wiederverwendbar per Parameter.
+Das Fixture wird nur einmal pro Modul erstellt und von allen Tests im Modul geteilt – statt für jeden Test neu.
+Mit pytest.raises(ExceptionType) als Context Manager: with pytest.raises(ValueError): ...
+Parametrisierung hält den Code DRY: ein Test, viele Datensätze. Neue Fälle kosten nur eine Zeile, Fehler zeigen genau welcher Datensatz scheitert.

@@ -203,3 +203,108 @@ Diskutiert: Würden eure Testfälle denselben Fehler finden?
 ---
 
 *Bei Problemen → [Stuck Protocol](../stuck_protocol.md)*
+
+
+Aufgabe 0
+a)
+
+Gültig: 1, 2, 3, 4, 5
+
+Ungültig: 0, –1, 6, 100, 2.5, "hoch"
+b)
+
+Eine Äquivalenzklasse ist eine Gruppe von Eingaben, bei denen das Programm immer gleich reagiert – testet man einen Wert, weiß man wie es bei allen anderen in der Gruppe auch läuft.
+c)
+
+Gültig: Eine Bestellmenge zwischen 1 und 999 wird akzeptiert.
+
+Ungültig: Eine Bestellmenge von 0 oder –5 wird abgelehnt.
+
+Grenzwert: Genau 999 – hier entstehen oft Off-by-One-Fehler.
+d)
+
+Die Grundannahme ist: Alle Werte innerhalb einer Klasse lösen dieselbe Programmlogik aus. Wenn 50 korrekt verarbeitet wird, wird auch 200 korrekt verarbeitet – beide nehmen denselben Codepfad.
+
+Aufgabe 1
+a) Äquivalenzklassentabelle
+AK-NrKlasseRepräsentativer WertGültig / UngültigAK11–999 (gültiger Bereich)500GültigAK2= 0 (explizit verboten)0UngültigAK3< 0 (negativ)–5UngültigAK4> 999 (zu groß)1000Ungültig
+b) Grenzwerttabelle
+GW-NrGrenzwertErwartetes ErgebnisGW10UngültigGW21GültigGW32GültigGW4998GültigGW5999GültigGW61000Ungültig
+c)
+pythondef validiere_menge(menge: int) -> bool:
+    return isinstance(menge, int) and 1 <= menge <= 999
+
+assert validiere_menge(500)  == True
+assert validiere_menge(1)    == True
+assert validiere_menge(999)  == True
+assert validiere_menge(0)    == False
+assert validiere_menge(-5)   == False
+assert validiere_menge(1000) == False
+
+Aufgabe 2
+a) Äquivalenzklassentabelle
+AK-NrRegelKlasseRepräsentantG/UAK1Länge8–64 ZeichenAbcd1234GültigAK2Länge< 8 ZeichenAb1!UngültigAK3Länge> 64 Zeichen65× 'a'UngültigAK4Großbuchstabemind. einer vorhandenAbcd1234GültigAK5Großbuchstabekeiner vorhandenabcd1234UngültigAK6Ziffermind. eine vorhandenAbcd1234GültigAK7Zifferkeine vorhandenAbcdefghUngültigAK8Leerzeichenkeines vorhandenAbcd1234GültigAK9Leerzeichenenthält LeerzeichenAbc d123Ungültig
+b)
+
+Abcd1234 → deckt AK1/4/6/8 ab (alle Regeln erfüllt, Minimalfall 8 Zeichen)
+
+Ab1! → AK2 (zu kurz)
+
+abcd1234 → AK5 (kein Großbuchstabe)
+
+Abcdefgh → AK7 (keine Ziffer)
+
+Abc d123 → AK9 (Leerzeichen)
+
+'A1' + 'x'×63 → AK3 (65 Zeichen, zu lang)
+c)
+pythonimport re
+
+def pruefe_passwort(pw: str) -> bool:
+    if not (8 <= len(pw) <= 64): return False
+    if not re.search(r'[A-Z]', pw): return False
+    if not re.search(r'\d', pw): return False
+    if ' ' in pw: return False
+    return True
+
+Aufgabe 3
+a) Grenzwerttabelle
+AlterKategorieKommentar11Kinder-Modusobere Grenze Kinder12Jugend-Modusuntere Grenze Jugend (Grenzwert!)13Jugend-Modusknapp über unterer Grenze17Jugend-Modusknapp unter oberer Grenze18Vollzuganguntere Grenze Vollzugang (Grenzwert!)19Vollzugangknapp über unterer Grenze
+b)
+
+0 → Ungültige Eingabe
+
+–1 → Negatives Alter muss abgefangen werden
+
+150 → Unrealistisch hoch
+
+12.5 → Kommazahl – akzeptiert das System nur Ganzzahlen?
+
+"abc" → Falscher Typ
+
+Aufgabe 4
+a) Äquivalenzklassen
+AK-NrKlasseRepräsentantNoteG/UAK192–100951GültigAK281–91852GültigAK367–80743GültigAK450–66584GültigAK530–49405GültigAK60–29156GültigAK7< 0–1FehlerUngültigAK8> 100101FehlerUngültig
+b) Grenzwerttabelle
+WertErwartete Note–1Fehler062963054955046646738038129129211001101Fehler
+c)
+
+Minimale Testfälle: –1, 0, 29, 30, 49, 50, 66, 67, 80, 81, 91, 92, 100, 101
+
+Diese 14 Werte decken alle 8 Äquivalenzklassen ab und testen jeden Notenübergang beidseitig – Off-by-One-Fehler werden sicher erkannt.
+pythondef berechne_note(punkte: int) -> int:
+    if not (0 <= punkte <= 100):
+        raise ValueError(f"Ungültige Punktzahl: {punkte}")
+    if punkte >= 92: return 1
+    if punkte >= 81: return 2
+    if punkte >= 67: return 3
+    if punkte >= 50: return 4
+    if punkte >= 30: return 5
+    return 6
+
+Active Recall
+
+Alle Eingaben einer Klasse lösen dieselbe Programmlogik aus – ein Repräsentant genügt.
+Ungültige Klassen prüfen, ob das System Fehleingaben korrekt abfängt und nicht abstürzt.
+Besonders häufig an Grenzwerten – Off-by-One-Fehler sind klassische Bugs.
+Mindestens ein Testfall pro Klasse – so viele wie es Klassen gibt.

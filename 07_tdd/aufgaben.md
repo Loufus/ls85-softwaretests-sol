@@ -228,3 +228,186 @@ Am Ende: Wieviele Tests habt ihr? Ist der Code gut strukturiert?
 ---
 
 *Bei Problemen → [Stuck Protocol](../stuck_protocol.md)*
+
+a) Richtige Reihenfolge: C → B → D → A → E
+b) Goldene TDD-Regel:
+
+Kein Produktionscode wird geschrieben, ohne dass vorher ein fehlschlagender Test existiert. Man beweist erst, dass etwas fehlt, bevor man es baut.
+c) Warum minimaler/hässlicher Code beim Green-Schritt?
+
+Weil das Ziel in dieser Phase nur ist, den Test zum Laufen zu bringen – nicht mehr. Sauberkeit kommt im Refactor-Schritt. Würde man sofort alles perfekt schreiben, verliert man den Fokus und riskiert, mehr zu implementieren als nötig.
+d) Baby Steps:
+
+Man schreibt immer nur einen einzigen Test für einen einzigen Aspekt und implementiert genau so viel, dass dieser eine Test grün wird. Das hält die Schritte klein und kontrollierbar – Fehler sind sofort lokalisierbar und man verliert nie den Überblick.
+
+Aufgabe 1
+pythonimport pytest
+
+# Zyklus 1
+def test_runden_3_ergibt_5():
+    assert runden_auf_naechste_fuenf(3) == 5
+
+# Minimale Implementierung nach Zyklus 1:
+def runden_auf_naechste_fuenf(zahl):
+    return 5  # hardcoded – reicht für genau diesen Test
+
+# Zyklus 2
+def test_runden_7_ergibt_10():
+    assert runden_auf_naechste_fuenf(7) == 10
+
+# Implementierung nach Zyklus 2:
+def runden_auf_naechste_fuenf(zahl):
+    import math
+    return math.ceil(zahl / 5) * 5
+
+# Zyklus 3
+def test_runden_10_ergibt_10():
+    assert runden_auf_naechste_fuenf(10) == 10
+
+# Zyklus 4
+def test_runden_0_ergibt_0():
+    assert runden_auf_naechste_fuenf(0) == 0
+
+# Zyklus 5
+def test_runden_negativ():
+    assert runden_auf_naechste_fuenf(-3) == 0
+
+# Finale Implementierung nach Refactoring:
+import math
+
+def runden_auf_naechste_fuenf(zahl: int | float) -> int:
+    if zahl <= 0:
+        return 0
+    return math.ceil(zahl / 5) * 5
+Protokoll:
+
+Nach Zyklus 1: 1 grün (hardcoded), 0 rot
+Nach Zyklus 2: 2 grün, echte Logik vorhanden
+Nach Zyklus 3–4: 4 grün, kein Refactoring nötig
+Nach Zyklus 5: 5 grün, Sonderfall für ≤ 0 ergänzt
+
+
+Aufgabe 2
+pythonimport pytest
+import string
+import random
+
+class TestPasswortGenerator:
+
+    # User Story 1 – Länge
+    def test_passwort_hat_korrekte_laenge(self):
+        gen = PasswortGenerator(laenge=12)
+        assert len(gen.generieren()) == 12
+
+    # User Story 2 – Großbuchstaben
+    def test_passwort_enthaelt_grossbuchstaben(self):
+        gen = PasswortGenerator(laenge=12, grossbuchstaben=True)
+        pw = gen.generieren()
+        assert any(c.isupper() for c in pw)
+
+    def test_passwort_ohne_grossbuchstaben(self):
+        gen = PasswortGenerator(laenge=12, grossbuchstaben=False)
+        pw = gen.generieren()
+        assert not any(c.isupper() for c in pw)
+
+    # User Story 3 – Ziffern
+    def test_passwort_enthaelt_ziffern(self):
+        gen = PasswortGenerator(laenge=12, ziffern=True)
+        pw = gen.generieren()
+        assert any(c.isdigit() for c in pw)
+
+    # User Story 4 – Sonderzeichen
+    def test_passwort_enthaelt_sonderzeichen(self):
+        gen = PasswortGenerator(laenge=12, sonderzeichen=True)
+        pw = gen.generieren()
+        assert any(c in string.punctuation for c in pw)
+
+    # User Story 5 – Mindestlänge
+    def test_mindestlaenge_wird_erzwungen(self):
+        with pytest.raises(ValueError, match="Mindestlänge"):
+            PasswortGenerator(laenge=4)
+
+    # User Story 6 – Ungültige Parameter
+    def test_keine_zeichenklasse_ausgewaehlt(self):
+        with pytest.raises(ValueError, match="Zeichenklasse"):
+            PasswortGenerator(laenge=8, grossbuchstaben=False,
+                              kleinbuchstaben=False, ziffern=False,
+                              sonderzeichen=False)
+
+
+class PasswortGenerator:
+    def __init__(self, laenge=12, grossbuchstaben=True,
+                 kleinbuchstaben=True, ziffern=True, sonderzeichen=False):
+        if laenge < 8:
+            raise ValueError("Mindestlänge ist 8 Zeichen")
+        if not any([grossbuchstaben, kleinbuchstaben, ziffern, sonderzeichen]):
+            raise ValueError("Mindestens eine Zeichenklasse muss ausgewählt sein")
+        self.laenge = laenge
+        self.zeichen = ""
+        if grossbuchstaben:
+            self.zeichen += string.ascii_uppercase
+        if kleinbuchstaben:
+            self.zeichen += string.ascii_lowercase
+        if ziffern:
+            self.zeichen += string.digits
+        if sonderzeichen:
+            self.zeichen += string.punctuation
+
+    def generieren(self) -> str:
+        return ''.join(random.choice(self.zeichen) for _ in range(self.laenge))
+
+Aufgabe 4
+a) Die drei TDD-Phasen:
+Red: Einen Test für eine noch nicht existierende Funktionalität schreiben und ausführen – er muss fehlschlagen, um zu beweisen, dass der Code noch fehlt.
+Green: Minimalen Produktionscode schreiben, der genau diesen Test grün macht – nicht mehr, nicht weniger. Qualität ist hier zweitrangig.
+Refactor: Den Code sauber machen (Namen verbessern, Duplikation beseitigen, Struktur verbessern), ohne die Funktionalität zu ändern. Alle Tests müssen danach weiterhin grün sein.
+b) Tests vor der Implementierung:
+pythonimport pytest
+
+def test_zinsen_normaler_fall():
+    assert berechne_zinsen(1000, 5, 1) == pytest.approx(50.0)
+
+def test_zinsen_mehrere_jahre():
+    assert berechne_zinsen(1000, 10, 3) == pytest.approx(300.0)
+
+def test_zinsen_nullprozent():
+    assert berechne_zinsen(1000, 0, 5) == pytest.approx(0.0)
+
+def test_negatives_kapital_wirft_fehler():
+    with pytest.raises(ValueError, match="Kapital"):
+        berechne_zinsen(-100, 5, 1)
+
+def test_negativer_zinssatz_wirft_fehler():
+    with pytest.raises(ValueError, match="Zinssatz"):
+        berechne_zinsen(1000, -5, 1)
+
+def test_negative_jahre_wirft_fehler():
+    with pytest.raises(ValueError, match="Jahre"):
+        berechne_zinsen(1000, 5, -1)
+c) Implementierung:
+pythondef berechne_zinsen(kapital: float, zinssatz: float, jahre: int) -> float:
+    if kapital < 0:
+        raise ValueError("Kapital darf nicht negativ sein")
+    if zinssatz < 0:
+        raise ValueError("Zinssatz darf nicht negativ sein")
+    if jahre < 0:
+        raise ValueError("Jahre darf nicht negativ sein")
+    return kapital * (zinssatz / 100) * jahre
+d) Vor- und Nachteile:
+Vorteile:
+
+Tests entstehen automatisch als Nebenprodukt der Entwicklung – keine nachträgliche Testarbeit
+Man denkt gezwungenermaßen über die Schnittstelle nach, bevor man implementiert – führt zu besserem Design
+
+Nachteil:
+
+Anfangs deutlich langsamer, vor allem bei wenig TDD-Erfahrung – das kostet in Projekten mit Zeitdruck Überzeugungsarbeit
+
+
+Active Recall
+
+Kein Produktionscode ohne vorher einen fehlschlagenden Test.
+Immer nur einen Test auf einmal schreiben und genau so viel Code, dass dieser eine Test grün wird.
+Weil der Refactor-Schritt direkt danach kommt – sauberer Code ist das Ziel der Refactor-Phase, nicht der Green-Phase.
+Den Code lesbarer, wartbarer und strukturierter machen, ohne Funktionalität zu verändern – alle Tests müssen grün bleiben.
+Man ist gezwungen, die Schnittstelle (Eingaben, Ausgaben, Fehlerfälle) zu durchdenken, bevor man irgendetwas implementiert – das führt zu durchdachterem Design.

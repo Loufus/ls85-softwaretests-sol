@@ -205,3 +205,61 @@ Diskutiert: Was hat die Black-Box-Perspektive übersehen? Was hat die White-Box-
 ---
 
 *Bei Problemen → [Stuck Protocol](../stuck_protocol.md)*
+
+
+
+a) Unterschiede:
+
+Black-Box: Tester kennt den Code nicht – er testet nur über Ein- und Ausgaben. Frage: „Liefert die Funktion bei dieser Eingabe die richtige Ausgabe?"
+White-Box: Tester kennt den Code und prüft, ob alle Pfade/Zweige durchlaufen werden. Frage: „Wird jede Codezeile/jeder Zweig tatsächlich ausgeführt?"
+
+b) Zuordnung:
+SituationMethodeEin Kunde testet, ob er sich einloggen kannBlack-BoxEin Entwickler prüft, ob alle if-Zweige durchlaufen werdenWhite-BoxEin Tester gibt verschiedene Passwörter ein und schaut, was passiertBlack-BoxEin Entwickler misst die Testabdeckung (Coverage)White-BoxEin externes Testteam prüft das System gegen die SpezifikationBlack-Box
+c) Beide Methoden kombiniert decken sowohl funktionale Fehler (falsche Ausgaben) als auch strukturelle Lücken (nicht getestete Codepfade) ab.
+
+Aufgabe 1 – Black-Box: Benutzerauthentifizierung
+TC-NrEingabe (User/PW)Erwartete AusgabeKategorieTC01admin / geheim123TrueGültiger LoginTC02admin / falsch1234FalseFalsches PasswortTC03unbekannt / geheim123FalseUnbekannter BenutzerTC04ab / geheim123FalseUsername zu kurz (< 3 Zeichen)TC05admin / kurzFalsePasswort zu kurz (< 8 Zeichen)TC06adm!n / geheim123FalseSonderzeichen im UsernameTC07(leer) / geheim123FalseLeerer UsernameTC08admin / (leer)FalseLeeres Passwort
+
+Aufgabe 2 – White-Box: Coverage (versandkosten-ähnliche Logik)
+Für kategorisiere_bestellung() gilt analog – hier am Beispiel der Aufgabe 4-Funktion erklärt, da kein starter.py vorliegt.
+Kontrollflussgraph (ASCII) für versandkosten:
+        [Start]
+           |
+    [gewicht <= 0?]
+      /          \
+   Ja             Nein
+[raise ValueError] [express?]
+                  /        \
+               Ja            Nein
+        [gewicht<=5?]    [gewicht<=5?]
+         /      \          /      \
+       Ja       Nein     Ja       Nein
+   [8.90]     [14.90] [3.90]    [6.90]
+Knoten: 8 | Kanten: 9
+
+Aufgabe 3 – Methoden vergleichen
+MerkmalBlack-BoxWhite-BoxCodekenntnis notwendig?NeinJaAus wessen Perspektive?Benutzer / Kunde / externer TesterEntwicklerWas wird geprüft?Funktionalität (Ein-/Ausgabe)Codestruktur, Pfade, ZweigeTypische WerkzeugeTestfallkataloge, Äquivalenzklassen, GrenzwertanalyseCoverage-Tools (z. B. pytest-cov), DebuggerVorteilUnabhängig vom Code, NutzerperspektiveFindet ungetestete Codepfade, hohe PräzisionNachteilKann interne Fehler übersehenAufwendig, kein Blick auf Gesamtverhalten
+
+Aufgabe 4 – IHK-Stil (versandkosten)
+(a) Kontrollflussgraph:
+N1: Funktionsstart
+N2: if gewicht_kg <= 0  →  Ja → N3: raise ValueError / Ende
+                         →  Nein → N4
+N4: if express           →  Ja → N5
+                         →  Nein → N7
+N5: if gewicht_kg <= 5  →  Ja → N6: return 8.90
+                         →  Nein → N6b: return 14.90
+N7: if gewicht_kg <= 5  →  Ja → N8: return 3.90
+                         →  Nein → N8b: return 6.90
+(b) Zweigüberdeckung – 5 Testfälle:
+TCgewicht_kgexpressErwartungAbgedeckter ZweigTC1-1FalseValueErrorN2 → JaTC23.0True8.90N2→Nein, N4→Ja, N5→JaTC37.0True14.90N4→Ja, N5→NeinTC43.0False3.90N4→Nein, N7→JaTC57.0False6.90N7→Nein
+→ Alle 9 Kanten abgedeckt ✅
+(c) Grenzwertanalyse (Black-Box):
+TCgewicht_kgexpressBegründungTC65.0TrueGrenzwert genau 5 kg → 8.90?TC75.01TrueKnapp über Grenze → 14.90?TC85.0FalseGrenzwert genau 5 kg → 3.90?TC90.01FalseKleinstes gültiges Gewicht
+
+Active Recall
+
+Black-Box = nur Ein-/Ausgabe bekannt; White-Box = Code bekannt, interne Pfade werden geprüft
+Jede Anweisung wurde mindestens einmal ausgeführt – garantiert keine fehlerfreie Software, da Zweige evtl. nicht alle getestet wurden
+Branch Coverage fordert, dass jeder if/else-Zweig (auch der else-Fall) durchlaufen wird – Statement Coverage reicht schon, wenn die Zeile einmal erreicht wurde, egal über welchen Pfad
+Unit-Tests (Modultest) – hier hat der Entwickler direkten Codezugriff
